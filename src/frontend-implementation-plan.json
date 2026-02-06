@@ -1,0 +1,45 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix post-login infinite spinner by enabling caller profile query and robust auth gate",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Update the authenticated loading gate so users never get stuck on a full-screen spinner after Internet Identity login and always reach Profile Setup (no profile) or the dashboard (profile exists).",
+      "acceptanceCriteria": [
+        "After a successful login, the spinner is not shown indefinitely.",
+        "If no user profile exists yet, the Profile Setup modal is rendered.",
+        "If a user profile exists, the Candidate Dashboard is rendered.",
+        "The logic does not depend on a React Query hook that is permanently `enabled: false`."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Refactor the authenticated rendering gate to depend on the caller-profile query's resolved states (loading/success/no-profile/error) rather than blocking on `isFetched` alone; ensure the UI falls through to either ProfileSetupModal (when profile is null) or CandidateDashboard (when profile exists) after login, without requiring a refresh. Use the selected \"authorization\" component guidance for preventing profile setup modal flash; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Wire and enable useGetCallerUserProfile() so it performs a real backend call when an actor is available and provides reliable isLoading/isFetched/data for App.tsx gating.",
+      "acceptanceCriteria": [
+        "`useGetCallerUserProfile()` no longer hardcodes `enabled: false`.",
+        "When logged in, the hook performs a real backend call and resolves to either a profile or null.",
+        "`App.tsx` no longer blocks rendering solely because `isFetched` can never become true."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Implement `useGetCallerUserProfile()` to call `actor.getCallerUserProfile()` and enable the query when `actor` is available and the actor is not fetching; return derived `isLoading`/`isFetched` states that account for the actor dependency to avoid permanent loading. Also update the existing caller-profile save mutation to call `actor.saveCallerUserProfile(...)` (used by ProfileSetupModal and customization flows) and invalidate `['currentUserProfile']` on success. Use the selected \"authorization\" component guidance for frontend profile setup/login flows and cache clearing behavior; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/ProfileSetupModal.tsx",
+          "operation": "modify",
+          "description": "Ensure the profile setup submit flow correctly relies on the updated `useSaveCallerUserProfile()` mutation and, on successful save, the app transitions out of the modal via invalidated/refetched `['currentUserProfile']` data (no manual refresh needed)."
+        }
+      ]
+    }
+  ]
+}

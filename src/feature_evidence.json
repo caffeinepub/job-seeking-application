@@ -1,0 +1,48 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-fix-the-authenticated-loading-gate-so-the-app-does-not-get-stuck-on-the-full-screen-spinner-after-internet-identity-login-when-the-current-user-profile-query-is-disabled-or-never-fetches-ensure-authenticated-users-always-reach-either-the-profile-setup-modal-no-profile-yet-or-the-dashboard-profile-exists-without-requiring-a-hard-refresh",
+      "featureTitle": "Fix the authenticated loading gate so the app does not get stuck on the full-screen spinner after Internet Identity login when the current-user profile query is disabled or never fetches. Ensure authenticated users always reach either the Profile Setup modal (no profile yet) or the dashboard (profile exists) without requiring a hard refresh.",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-usegetcalleruserprofile-to-call-the-new-backend-method-and-enable-it-when-an-actor-is-available-so-app-tsx-can-reliably-use-its-isloading-isfetched-data-to-decide-between-landing-page-profile-setup-modal-and-dashboard",
+      "featureTitle": "Wire `useGetCallerUserProfile()` to call the new backend method and enable it when an actor is available, so `App.tsx` can reliably use its `isLoading/isFetched/data` to decide between Landing Page, Profile Setup modal, and dashboard.",
+      "files": [
+        "frontend/src/components/ProfileSetupModal.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

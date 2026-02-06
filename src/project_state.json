@@ -1,0 +1,440 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 6,
+  "summary": "JobConnect scope has expanded from a mostly scaffolded ICP job marketplace into a full-featured job seeking/hiring platform roadmap including messaging, notifications, resume uploads, interview scheduling, feedback/ratings, recommendations, analytics, gamification, admin tooling, AI features, advanced search/filtering, and engagement modules (leaderboards/referrals, learning hub, growth tracker, career paths, certifications).",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Internet Identity authentication (login/logout, identity persistence)",
+      "synonyms": [
+        "II auth",
+        "DFINITY AuthClient integration"
+      ],
+      "description": "Provides a React context (InternetIdentityProvider) that initializes an AuthClient, loads a stored identity on mount, supports login via the configured identity provider, and logout/clear. Includes login status flags and 30-day delegation TTL configuration.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Authenticated ICP actor creation and lifecycle management",
+      "synonyms": [
+        "useActor",
+        "actor factory"
+      ],
+      "description": "Creates an ICP canister actor with or without an identity, caches it via React Query keyed by principal, calls backend access-control initialization on actor creation, and invalidates/refetches dependent queries when the actor changes.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "Access control initialization and admin role management (backend)",
+      "synonyms": [
+        "RBAC",
+        "admin token bootstrap"
+      ],
+      "description": "Motoko access-control module assigns #admin to the first caller who supplies the correct secret token (compared against CAFFEINE_ADMIN_TOKEN env var); otherwise assigns #user. Exposes mixin methods for role retrieval, admin checks, and admin-only role assignment.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "Secret admin token retrieval via URL hash with session persistence",
+      "synonyms": [
+        "getSecretParameter",
+        "hash secret extraction"
+      ],
+      "description": "Utilities parse secrets from the URL hash fragment (not query string), persist them in sessionStorage, and remove them from the URL (history-safe) to reduce accidental leakage. Used to pass the admin token to access-control initialization.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "Theme switching and Tailwind OKLCH design system",
+      "synonyms": [
+        "dark mode",
+        "next-themes"
+      ],
+      "description": "Implements light/dark/system theme switching via next-themes and uses Tailwind with OKLCH CSS variables for consistent theming across UI components.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Landing page with marketing sections and company showcase scaffolding",
+      "synonyms": [
+        "home page",
+        "public landing"
+      ],
+      "description": "Public landing page includes hero/CTA, features grid, and a featured companies section that filters for approved company pages (currently empty due to placeholder company-page query).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Onboarding profile setup modal (UI scaffold)",
+      "synonyms": [
+        "ProfileSetupModal",
+        "new user setup"
+      ],
+      "description": "Modal UI collects name, email, and role (candidate/employer) and triggers a placeholder mutation (useSaveCallerUserProfile) that currently only displays toasts and does not persist data.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Profile customization UI with image upload to ICP blob objects (client-side)",
+      "synonyms": [
+        "avatar upload",
+        "profile picture upload"
+      ],
+      "description": "Allows user to edit bio and contact info and select an image file. Uses ExternalBlob.fromBytes(...).withUploadProgress(...) to create a blob reference and render a direct URL preview. Backend persistence is currently stubbed via placeholder mutation.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "Candidate dashboard navigation (tabbed UI)",
+      "synonyms": [
+        "CandidateDashboard",
+        "candidate tabs"
+      ],
+      "description": "Tabbed candidate UI providing sections for Learning Hub, Growth Tracker, Career Path, Certifications, Leaderboard, Resume Analysis, Referrals, and Profile Customization. Data for most tabs relies on placeholder hooks.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Learning Hub UI (search, category filter, saved/completed views)",
+      "synonyms": [
+        "learning resources browser",
+        "learning progress UI"
+      ],
+      "description": "Displays learning resources with search and category filtering, saved/completed toggles, and UI actions to mark completed or save for later (mutations currently stubbed). Includes counts and difficulty/type badges.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Skill Growth Tracker UI (progress metrics and activity timeline)",
+      "synonyms": [
+        "growth tracker",
+        "skill progression dashboard"
+      ],
+      "description": "Renders overall growth progress, weighted metric cards, per-skill-area progress bars, and recent activity items for learning/assessments/feedback based on SkillGrowthData and LearningProgress queries (currently placeholder/disabled).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-12",
+      "title": "Career Path recommendations UI with generation trigger (scaffold)",
+      "synonyms": [
+        "career roadmap",
+        "career path tab"
+      ],
+      "description": "Displays a career progression timeline, recommended roles, skill priorities, and aligned resources when career-path data exists; includes a 'Generate Career Path' action that currently sends mock input to a placeholder mutation and refetches a disabled query.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "Leaderboard UI with badge and sorting filters (scaffold)",
+      "synonyms": [
+        "rankings",
+        "gamification leaderboard"
+      ],
+      "description": "Leaderboard view supports badge-level filtering and sorting by total score/activity/referral points, highlights current user position when present, and shows motivational guidance. Backend data hook is currently disabled and returns an empty list.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "Job search UI with advanced filters (candidate)",
+      "synonyms": [
+        "job browse",
+        "job listing filters"
+      ],
+      "description": "Candidate JobSearchTab provides filters for experience level, salary range, and minimum rating with a collapsible filter panel and active filter tags. The job search query is currently disabled and returns no results.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-15",
+      "title": "Candidate browsing UI with advanced filters (employer)",
+      "synonyms": [
+        "candidate search",
+        "talent browse"
+      ],
+      "description": "Employer-facing CandidatesTab provides filtering by experience level, skills, and rating, sorting by experience/skills match/rating, and renders candidate cards with badge/points visuals plus optional growth/career path summaries (dependent queries are currently disabled).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-16",
+      "title": "Floating AI chat assistant with scripted role-based flows",
+      "synonyms": [
+        "AIChatAssistant",
+        "in-app assistant"
+      ],
+      "description": "Client-side chat widget with message history, typing simulation, keyword-triggered responses, and quick-action buttons. Uses the caller's profile role (if available) to switch between candidate/employer scripts; no external AI API calls.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-17",
+      "title": "Company branding and company page management UI (scaffold)",
+      "synonyms": [
+        "company pages",
+        "employer branding",
+        "admin approval UI"
+      ],
+      "description": "Employer branding tab scaffolds logo/banner upload and company info form (mutations are placeholders). Admin company pages tab scaffolds review/search/filter and approve/reject/remove actions (mutations are placeholders).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-18",
+      "title": "Referral system UI (scaffold)",
+      "synonyms": [
+        "referrals tab",
+        "referral stats"
+      ],
+      "description": "Referral tab displays stats cards, a form to create a referral by principal ID, and a history table. Underlying hooks return stub data and mutations show 'coming soon' messaging.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Admin dashboard tabbed UI scaffolding",
+      "synonyms": [
+        "admin console"
+      ],
+      "description": "AdminDashboard provides tab navigation for user management, system analytics, activity monitoring, company pages, AI insights, and certifications. Several tabs are placeholders with feature notices; AI insights uses mock data charts.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-20",
+      "title": "Employer AI Insights dashboard with interactive charts (mock data)",
+      "synonyms": [
+        "hiring analytics",
+        "AI insights (employer)"
+      ],
+      "description": "Employer AI insights tab renders multiple Recharts visualizations (top jobs, candidate scores, funnel, recommendations) with timeframe selector; data is explicitly mock/demo.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-21",
+      "title": "Backend HTTP outcall utilities",
+      "synonyms": [
+        "IC http_request wrapper",
+        "outcall.mo"
+      ],
+      "description": "Implements HTTP GET/POST wrappers around the management canister http_request with cycle budgeting, custom headers, idempotency key for POST, and a transform function that strips response headers.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-22",
+      "title": "Backend blob-storage maintenance mixin and cashier top-up flow",
+      "synonyms": [
+        "storage gateway authorization",
+        "dead blob pruning",
+        "cycle refill"
+      ],
+      "description": "Provides canister methods to update authorized gateway principals via an external cashier canister, check blob liveness, list dead blobs for deletion, confirm deletion and trigger GC, and request cashier refills with cycles.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-23",
+      "title": "Career path data model and generator function (backend module)",
+      "synonyms": [
+        "career-path.mo"
+      ],
+      "description": "Defines comprehensive career-path-related types (progress stages, objectives, skill areas, recommended roles, industry trends) and includes a generator function that assembles CareerPathRecommendations from an update payload.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-authenticated-loading-gate-so-the-app-does-not-get-stuck-on-the-full-screen-spinner-after-internet-identity-login-when-the-current-user-profile-query-is-disabled-or-never-fetches-ensure-authenticated-users-always-reach-either-the-profile-setup-modal-no-profile-yet-or-the-dashboard-profile-exists-without-requiring-a-hard-refresh",
+      "title": "Fix the authenticated loading gate so the app does not get stuck on the full-screen spinner after Internet Identity login when the current-user profile query is disabled or never fetches. Ensure authenticated users always reach either the Profile Setup modal (no profile yet) or the dashboard (profile exists) without requiring a hard refresh.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-usegetcalleruserprofile-to-call-the-new-backend-method-and-enable-it-when-an-actor-is-available-so-app-tsx-can-reliably-use-its-isloading-isfetched-data-to-decide-between-landing-page-profile-setup-modal-and-dashboard",
+      "title": "Wire `useGetCallerUserProfile()` to call the new backend method and enable it when an actor is available, so `App.tsx` can reliably use its `isLoading/isFetched/data` to decide between Landing Page, Profile Setup modal, and dashboard.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "In-app messaging between employers and candidates (chat UI + conversation management)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "In-app notifications system (new messages, applications, interview updates, status changes)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Resume/portfolio upload and employer viewing (blob storage + preview)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Interview scheduling system (create/update/cancel interviews, calendar-style views, notify both parties)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Internal interview feedback & rating system (post-interview evaluations visible to relevant parties)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Job/candidate recommendation engine (matching and personalized recommendations)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Basic analytics dashboard (role-based key metrics; initially simplified totals, later charts)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Simplified gamification (points for key actions + Bronze/Silver/Gold badges; visible on candidate profiles)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Admin dashboard (user management + system-wide monitoring/analytics/moderation)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "AI-powered resume analysis (scoring, insights, tips; surfaced to candidates and employers)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Company pages & employer branding (logo/banner, branded company profile, shown on job listings)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Referral points system (earn points for successful referrals; referral history UI)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "AI chat assistant (in-app assistant to guide posting, applying, interview prep, resume tips)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Advanced job and candidate search filters (experience level, salary range, rating; sorting)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Job market simulation mode (visual step-by-step demo with play/pause/restart)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Skill growth tracker (track learning/test/feedback progress over time; candidate view + employer summary)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Gamified leaderboards (rank top users by points/badges; filters; real-time updates)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "AI insights dashboard (predictive/insightful analytics for employers/admins)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Career path recommendations (personalized role progression + skill focus + milestones)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Certification system (award/verify certificates tied to learning/tests/milestones)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Video interview integration (embedded video interview room inside interview flow)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Implement backend public methods needed to fetch the caller's user profile so the frontend can query it: add a read method that returns the caller's stored profile (or null/none if missing), and add a write method to create/update the caller's profile (used by the existing profile setup/customization flows). Persist the data in the existing in-memory `userProfiles` Map already defined in `backend/main.mo`.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    }
+  ],
+  "architectural_notes": [
+    "Frontend uses React with TanStack React Query for data fetching/caching; hooks are centralized in frontend/src/hooks/useQueries.ts.",
+    "Authentication is via DFINITY Internet Identity using @dfinity/auth-client, exposed through a React context provider (InternetIdentityProvider).",
+    "Backend actor construction on the frontend is abstracted via useActor(), which builds an ICP actor (anonymous or authenticated) and triggers an initialization call for access control.",
+    "Backend uses a Motoko 'mixin' pattern to compose functionality (MixinAuthorization, blob-storage Mixin).",
+    "Role-based access control is implemented in Motoko using an in-canister map and an environment-provided admin token; the first properly-initialized caller can become admin.",
+    "Blob-storage maintenance is integrated via Motoko Prim storage APIs (dead blob discovery/pruning, liveness checks) plus an external 'cashier' canister for cycle top-ups and gateway principal lists.",
+    "HTTP outcalls are implemented via the management canister (ic:aaaaa-aa) with a transform function stripping headers and fixed cycle budgeting.",
+    "UI styling is Tailwind-based with OKLCH CSS variables and next-themes theme switching (light/dark/system).",
+    "Several UI areas (AI insights dashboards) use Recharts with mock data for demonstration.",
+    "URL secret handling is implemented via hash-fragment parsing + sessionStorage persistence, with automatic removal from the URL to reduce leakage."
+  ],
+  "known_issues": [
+    "Most React Query hooks in useQueries.ts are placeholders and explicitly disabled (enabled: false) or return stubbed values; core functionality (profiles, jobs, candidates, learning resources, progress, notifications, referrals, company pages, leaderboard, certifications, career path data) is not wired to backend APIs.",
+    "useGetCallerUserProfile() returns null and has enabled:false; App.tsx gates authenticated rendering on isFetched, which can lead to an infinite loading spinner after login because the profile query never fetches.",
+    "Backend main.mo defines extensive types and in-memory Map state but (in the provided code) does not expose corresponding public methods for CRUD operations; only access control mixin methods and blob-storage maintenance methods are clearly implemented.",
+    "Frontend role model (candidate/employer/admin) does not directly match the backend access-control roles (#admin/#user/#guest) and backend domain roles (#candidate/#employer), suggesting unfinished integration/mapping.",
+    "EmployerDashboard and AdminDashboard exist, but App.tsx routes authenticated users to CandidateDashboard only; role-based dashboard routing appears incomplete.",
+    "Environment variable naming appears inconsistent/typo-prone in blob storage: CAFFFEINE_STORAGE_CASHIER_PRINCIPAL (triple 'F') likely should be CAFFEINE_STORAGE_CASHIER_PRINCIPAL.",
+    "Storage.refillCashier computes Nat.sub(currentBalance, reservedCycles); if currentBalance < reservedCycles this may trap or underflow depending on Nat.sub semantics, risking runtime failure.",
+    "Multiple UI tabs present 'coming soon' notices; several referenced components/files are empty or not shown here, indicating incomplete implementation.",
+    "Several requested/attempted feature implementations in the conversation report intermittent failures (\"AI couldn't implement\" / deployment unsuccessful / draft expiry requiring rebuild), indicating build/deploy reliability and/or prompt-to-implementation limitations to address in the actual project."
+  ],
+  "isFixRequest": true,
+  "gameProjectType": "none",
+  "projectName": "JobConnect",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

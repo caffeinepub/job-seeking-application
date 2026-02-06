@@ -1,0 +1,76 @@
+{
+  "kind": "build_request",
+  "title": "Fix infinite loading after login by wiring caller profile query and backend method",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Fix the authenticated loading gate so the app does not get stuck on the full-screen spinner after Internet Identity login when the current-user profile query is disabled or never fetches. Ensure authenticated users always reach either the Profile Setup modal (no profile yet) or the dashboard (profile exists) without requiring a hard refresh.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "fix an issue"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After a successful login, the spinner is not shown indefinitely.",
+        "If no user profile exists yet, the Profile Setup modal is rendered.",
+        "If a user profile exists, the Candidate Dashboard is rendered.",
+        "The logic does not depend on a React Query hook that is permanently `enabled: false`."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement backend public methods needed to fetch the caller's user profile so the frontend can query it: add a read method that returns the caller's stored profile (or null/none if missing), and add a write method to create/update the caller's profile (used by the existing profile setup/customization flows). Persist the data in the existing in-memory `userProfiles` Map already defined in `backend/main.mo`.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "fix an issue"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend exposes a callable method to get the caller's profile that returns 'none' when not set and 'some(profile)' when set.",
+        "Backend exposes a callable method to set/update the caller's profile.",
+        "Round-trip works end-to-end: after saving a profile once, subsequent reads return the saved profile."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Wire `useGetCallerUserProfile()` to call the new backend method and enable it when an actor is available, so `App.tsx` can reliably use its `isLoading/isFetched/data` to decide between Landing Page, Profile Setup modal, and dashboard.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "fix an issue"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`useGetCallerUserProfile()` no longer hardcodes `enabled: false`.",
+        "When logged in, the hook performs a real backend call and resolves to either a profile or null.",
+        "`App.tsx` no longer blocks rendering solely because `isFetched` can never become true."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single-actor Motoko canister; add new methods inside `backend/main.mo`.",
+    "Do not modify files under `frontend/src/components/ui` (read-only UI component sources).",
+    "Do not modify immutable paths: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`."
+  ],
+  "nonGoals": [
+    "Implementing the full job marketplace CRUD APIs (jobs, applications, messaging, etc.).",
+    "Adding new dashboards or role-based routing beyond resolving the login/loading issue.",
+    "Replacing placeholder data in other tabs (Learning Hub, Leaderboard, Referrals, etc.) beyond what is required for the profile fetch/save flow."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
