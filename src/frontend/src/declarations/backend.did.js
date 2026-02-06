@@ -44,6 +44,14 @@ export const UserProfile = IDL.Record({
   'email' : IDL.Text,
   'customization' : ProfileCustomization,
 });
+export const UserProfileInputs = IDL.Record({
+  'bio' : IDL.Text,
+  'contactInfo' : ContactInfo,
+  'name' : IDL.Text,
+  'role' : UserRole,
+  'email' : IDL.Text,
+  'profilePictureRef' : IDL.Opt(ExternalBlob),
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -76,8 +84,14 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole__1], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole__1], ['query']),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfileInputs], [], []),
+  'setProfileCustomization' : IDL.Func([ProfileCustomization], [], []),
 });
 
 export const idlInitArgs = [];
@@ -116,6 +130,14 @@ export const idlFactory = ({ IDL }) => {
     'email' : IDL.Text,
     'customization' : ProfileCustomization,
   });
+  const UserProfileInputs = IDL.Record({
+    'bio' : IDL.Text,
+    'contactInfo' : ContactInfo,
+    'name' : IDL.Text,
+    'role' : UserRole,
+    'email' : IDL.Text,
+    'profilePictureRef' : IDL.Opt(ExternalBlob),
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -148,8 +170,14 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole__1], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole__1], ['query']),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfileInputs], [], []),
+    'setProfileCustomization' : IDL.Func([ProfileCustomization], [], []),
   });
 };
 

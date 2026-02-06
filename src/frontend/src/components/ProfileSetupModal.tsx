@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Briefcase, User } from 'lucide-react';
-import { UserRole } from '../backend';
+import { UserRole, type UserProfile } from '../backend';
 
 export default function ProfileSetupModal() {
   const [name, setName] = useState('');
@@ -17,7 +17,7 @@ export default function ProfileSetupModal() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() && email.trim()) {
-      saveProfile.mutate({
+      const profile: UserProfile = {
         name: name.trim(),
         email: email.trim(),
         role,
@@ -29,7 +29,8 @@ export default function ProfileSetupModal() {
           },
           profilePicture: undefined,
         },
-      });
+      };
+      saveProfile.mutate(profile);
     }
   };
 

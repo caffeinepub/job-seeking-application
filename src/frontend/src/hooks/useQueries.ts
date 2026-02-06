@@ -3,7 +3,7 @@ import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
 import { Principal } from '@icp-sdk/core/principal';
 import { toast } from 'sonner';
-import type { UserProfile } from '../backend';
+import type { UserProfile, ProfileCustomization, UserRole__1 } from '../backend';
 
 // Local type definitions for features not in backend interface
 export enum AppUserRole {
@@ -262,7 +262,14 @@ export function useSaveCallerUserProfile() {
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.saveCallerUserProfile(profile);
+      // First save the profile using setProfileCustomization
+      await actor.setProfileCustomization({
+        bio: profile.customization.bio,
+        contactInfo: profile.customization.contactInfo,
+        profilePicture: profile.customization.profilePicture,
+      });
+      // Store the full profile in the query cache for immediate use
+      queryClient.setQueryData(['currentUserProfile'], profile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
@@ -279,9 +286,9 @@ export function useUpdateProfileCustomization() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (customization: UserProfile['customization']) => {
-      toast.info('Profile customization feature coming soon');
-      return Promise.resolve();
+    mutationFn: async (customization: ProfileCustomization) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.setProfileCustomization(customization);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });

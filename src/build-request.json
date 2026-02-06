@@ -1,73 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Fix infinite loading after login by wiring caller profile query and backend method",
+  "title": "Add profile picture support for user profiles",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the authenticated loading gate so the app does not get stuck on the full-screen spinner after Internet Identity login when the current-user profile query is disabled or never fetches. Ensure authenticated users always reach either the Profile Setup modal (no profile yet) or the dashboard (profile exists) without requiring a hard refresh.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "fix an issue"
-        ]
-      },
-      "acceptanceCriteria": [
-        "After a successful login, the spinner is not shown indefinitely.",
-        "If no user profile exists yet, the Profile Setup modal is rendered.",
-        "If a user profile exists, the Candidate Dashboard is rendered.",
-        "The logic does not depend on a React Query hook that is permanently `enabled: false`."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Implement backend public methods needed to fetch the caller's user profile so the frontend can query it: add a read method that returns the caller's stored profile (or null/none if missing), and add a write method to create/update the caller's profile (used by the existing profile setup/customization flows). Persist the data in the existing in-memory `userProfiles` Map already defined in `backend/main.mo`.",
+      "text": "Persist each authenticated user’s profile picture selection in the backend user profile record (stored per caller Principal) so it is returned by getCallerUserProfile() after being saved via setProfileCustomization().",
       "target": "backend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "fix an issue"
+          "Add the feature of profile picture"
         ]
       },
       "acceptanceCriteria": [
-        "Backend exposes a callable method to get the caller's profile that returns 'none' when not set and 'some(profile)' when set.",
-        "Backend exposes a callable method to set/update the caller's profile.",
-        "Round-trip works end-to-end: after saving a profile once, subsequent reads return the saved profile."
+        "When the caller saves a profile picture via setProfileCustomization(profilePictureRef = some blob ref), subsequent getCallerUserProfile() calls return customization.profilePicture = that same blob reference.",
+        "When the caller removes their profile picture and saves (profilePictureRef = null), subsequent getCallerUserProfile() calls return customization.profilePicture = null.",
+        "The profile picture reference is stored in stable state so it survives canister upgrades."
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Wire `useGetCallerUserProfile()` to call the new backend method and enable it when an actor is available, so `App.tsx` can reliably use its `isLoading/isFetched/data` to decide between Landing Page, Profile Setup modal, and dashboard.",
+      "id": "REQ-2",
+      "text": "Update the Profile Customization UI flow so users can upload, preview, remove, and save a profile picture, and the saved value reloads correctly from getCallerUserProfile().",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "fix an issue"
+          "Add the feature of profile picture"
         ]
       },
       "acceptanceCriteria": [
-        "`useGetCallerUserProfile()` no longer hardcodes `enabled: false`.",
-        "When logged in, the hook performs a real backend call and resolves to either a profile or null.",
-        "`App.tsx` no longer blocks rendering solely because `isFetched` can never become true."
+        "The Profile Customization screen allows selecting an image file, shows a preview avatar, and blocks non-image files and images larger than 5MB with clear error messaging.",
+        "Clicking “Remove” clears the preview and, after clicking “Save Changes”, the backend is updated so reloading the page shows the fallback avatar (initials) again.",
+        "After successfully saving, the UI reflects the persisted profile picture by reloading/refreshing the current user profile query state (no manual refresh required)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Show the current user’s profile picture (or initials fallback) in the main authenticated app header wherever the signed-in user identity is displayed.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Add the feature of profile picture"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When the current user has a saved profile picture, the header displays it as an avatar image.",
+        "When the user has no saved profile picture, the header displays a fallback avatar with the user’s initials.",
+        "Updating the profile picture via the Profile Customization screen causes the header avatar to update after save (within the normal React Query refresh/invalidation flow)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single-actor Motoko canister; add new methods inside `backend/main.mo`.",
-    "Do not modify files under `frontend/src/components/ui` (read-only UI component sources).",
-    "Do not modify immutable paths: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`."
+    "Backend must remain a single Motoko actor in backend/main.mo.",
+    "Do not edit any files under frontend/src/components/ui or any frontend immutablePaths listed in SYSTEM_CONTEXT; compose those components instead.",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Implementing the full job marketplace CRUD APIs (jobs, applications, messaging, etc.).",
-    "Adding new dashboards or role-based routing beyond resolving the login/loading issue.",
-    "Replacing placeholder data in other tabs (Learning Hub, Leaderboard, Referrals, etc.) beyond what is required for the profile fetch/save flow."
+    "Building a public user directory or viewing other users’ profile pictures.",
+    "Third-party image hosting, external databases, or external auth providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],

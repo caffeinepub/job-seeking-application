@@ -29,6 +29,14 @@ export interface UserProfile {
     email: string;
     customization: ProfileCustomization;
 }
+export interface UserProfileInputs {
+    bio: string;
+    contactInfo: ContactInfo;
+    name: string;
+    role: UserRole;
+    email: string;
+    profilePictureRef?: ExternalBlob;
+}
 export enum UserRole {
     employer = "employer",
     candidate = "candidate"
@@ -42,6 +50,8 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole__1): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole__1>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveCallerUserProfile(updates: UserProfileInputs): Promise<void>;
+    setProfileCustomization(customization: ProfileCustomization): Promise<void>;
 }

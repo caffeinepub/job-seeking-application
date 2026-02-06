@@ -1,59 +1,84 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T14:56:23.135Z",
-  "summary": "Frontend wiring for caller profile query and loading gate appears to be implemented (App.tsx now gates spinner on profileLoading; useQueries.ts summary indicates get/save caller profile hooks call backend actor methods). However, the diff summary does not provide clear evidence that the required new backend public methods were added to backend/main.mo. The diff also includes multiple feature additions (AI assistant, job CRUD UI, dashboard expansions) that go beyond the stated scope/non-goals.",
+  "generatedAt": "2026-02-06T04:39:00.552Z",
+  "summary": "Diff adds a new optional profilePicture field to backend ProfileCustomization/UserProfile types and a migration to initialize it to null, and implements a frontend profile customization UI for selecting/validating/previewing/removing an image plus header avatar display. However, key acceptance behaviors (backend stable persistence wiring and exact save/invalidation flow) are not fully verifiable from the provided truncated diff, and several unrelated frontend features appear to have been added/modified beyond the request.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "Implement backend public methods to get the caller's stored user profile (return none if missing, some(profile) if set) and to create/update the caller's profile, persisting in the existing in-memory userProfiles Map in backend/main.mo.",
-      "reason": "The provided backend/main.mo diff excerpt shows extensive type declarations but does not show any new public methods for get/set caller profile, nor any interaction with the existing userProfiles Map. Because the file content is truncated and no method signatures are visible in the summary, there is insufficient evidence that these backend methods were implemented.",
+      "id": "REQ-1",
+      "requirement": "Persist each authenticated user’s profile picture selection in stable backend user profile state so it is returned by getCallerUserProfile() after being saved via setProfileCustomization(profilePictureRef=...).",
+      "reason": "The diff shows type additions (profilePicture/profilePictureRef) and a migration setting profilePicture = null, but the provided backend/main.mo content is truncated before any stable-state declarations and before the implementations of setProfileCustomization() / getCallerUserProfile(). Therefore it cannot be confirmed that (a) profilePictureRef is actually persisted per-caller Principal, (b) null removal is persisted, and (c) it survives upgrades via stable state.",
       "evidence": [
-        "backend/main.mo (truncated excerpt shows types; no visible getCallerUserProfile/saveCallerUserProfile methods)"
+        "backend/main.mo (truncated; no setProfileCustomization/getCallerUserProfile implementation shown)",
+        "backend/migration.mo (only initializes profilePicture to null in migrated records)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "After successfully saving, the Profile Customization UI refreshes/reloads the current user profile query state (React Query invalidation/refresh) so persisted profile picture appears without manual refresh; and removing + saving persists null so reload shows fallback initials.",
+      "reason": "ProfileCustomizationTab implements file selection validation, preview, and a remove handler, but the diff is truncated before the submit/save logic completes, so it’s not possible to verify that saving sends profilePictureRef correctly (including null on remove) and that React Query is invalidated/refreshed after save.",
+      "evidence": [
+        "frontend/src/components/ProfileCustomizationTab.tsx (truncated before handleSubmit completes)",
+        "frontend/src/hooks/useQueries.ts (truncated; invalidation/refresh behavior not shown)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Updating the profile picture via the Profile Customization screen causes the header avatar to update after save within normal React Query refresh/invalidation flow.",
+      "reason": "The header avatar behavior is described in a summary, but the actual Header.tsx diff is not included; and the query invalidation/refresh after saving the profile picture is not verifiable from the truncated hooks/tab code. So the end-to-end “update after save” behavior cannot be confirmed.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions Header avatar behavior but not the actual code)",
+        "frontend/src/hooks/useQueries.ts (truncated; refresh/invalidation not shown)",
+        "frontend/src/components/ProfileCustomizationTab.tsx (truncated; save flow not shown)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added/expanded AI Chat Assistant component and conditional rendering in App for authenticated users with profiles.",
-      "reason": "Not requested; non-goals explicitly avoid expanding beyond resolving login/loading and profile fetch/save flow.",
+      "description": "Added/modified AI Chat Assistant behavior and UI beyond profile picture requirements.",
+      "reason": "Not requested in BuildRequest; profile picture support only. Diff shows changes to AIChatAssistant.",
       "evidence": [
-        "frontend/src/components/AIChatAssistant.tsx",
-        "frontend/src/App.tsx"
+        "frontend/src/components/AIChatAssistant.tsx"
       ]
     },
     {
-      "description": "Expanded/added job marketplace UI flows such as employer job listings creation/editing modals and related employer tabs.",
-      "reason": "Non-goal: implementing full job marketplace CRUD APIs and related functionality.",
-      "evidence": [
-        "frontend-file-summaries.txt (frontend/src/components/employer/JobListingsTab.tsx, CreateJobModal.tsx, EditJobModal.tsx, ApplicationsTab.tsx, CandidatesTab.tsx)"
-      ]
-    },
-    {
-      "description": "Added new dashboard tabs/features (e.g., AI Insights tab for EmployerDashboard, Certifications tab for CandidateDashboard).",
-      "reason": "Non-goal: adding new dashboards or expanding tabs beyond what is required for profile fetch/save flow.",
+      "description": "Added new dashboard tabs/features such as 'AI Insights' for employer dashboard and 'Certifications' for candidate dashboard.",
+      "reason": "Not requested in BuildRequest; unrelated to profile picture support.",
       "evidence": [
         "frontend-file-summaries.txt (frontend/src/pages/EmployerDashboard.tsx, frontend/src/pages/CandidateDashboard.tsx)"
       ]
     },
     {
-      "description": "Added/updated project_state.json describing a significantly expanded product roadmap.",
-      "reason": "Not requested and unrelated to the stated fix/wiring tasks.",
+      "description": "Learning Hub feature updates (resource filtering, progress, save-for-later, etc.).",
+      "reason": "Not requested in BuildRequest; unrelated feature work.",
       "evidence": [
-        "project_state.json"
+        "frontend/src/components/LearningHubTab.tsx"
+      ]
+    },
+    {
+      "description": "Large set of employer/candidate feature components (job listing create/edit modals, candidate browsing enhancements, job search filtering, etc.) referenced as changed.",
+      "reason": "Not requested in BuildRequest; indicates broader scope changes outside avatar/profile picture support.",
+      "evidence": [
+        "frontend-file-summaries.txt (multiple component paths under frontend/src/components/employer/* and frontend/src/components/candidate/*)"
+      ]
+    },
+    {
+      "description": "Workaround behavior described for saving caller profile via setProfileCustomization because saveCallerUserProfile doesn't exist.",
+      "reason": "Not part of requested profile picture support and may introduce unrelated profile persistence behavior changes.",
+      "evidence": [
+        "frontend-file-summaries.txt (frontend/src/hooks/useQueries.ts description)"
       ]
     }
   ],
   "confidence": 0.62,
   "changed_files": [
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
     "frontend/src/components/AIChatAssistant.tsx",
     "frontend/src/components/LearningHubTab.tsx",
     "frontend/src/components/ProfileCustomizationTab.tsx",
     "frontend/src/components/ProfileSetupModal.tsx",
-    "frontend/src/hooks/useInternetIdentity.ts",
     "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]

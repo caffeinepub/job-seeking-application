@@ -6,12 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Upload, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Camera, Upload, Loader2, X, AlertCircle } from 'lucide-react';
 import { ExternalBlob } from '../backend';
-import type { UserProfile } from '../backend';
+import type { ProfileCustomization } from '../backend';
 
 export default function ProfileCustomizationTab() {
-  const { data: userProfile } = useGetCallerUserProfile();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const updateCustomization = useUpdateProfileCustomization();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -22,6 +23,7 @@ export default function ProfileCustomizationTab() {
   const [profilePictureBlob, setProfilePictureBlob] = useState<ExternalBlob | undefined>(undefined);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (userProfile?.customization) {
@@ -33,6 +35,10 @@ export default function ProfileCustomizationTab() {
         const url = userProfile.customization.profilePicture.getDirectURL();
         setProfilePictureUrl(url);
         setProfilePictureBlob(userProfile.customization.profilePicture);
+      } else {
+        // Clear state when no picture is returned from backend
+        setProfilePictureUrl(null);
+        setProfilePictureBlob(undefined);
       }
     }
   }, [userProfile]);
@@ -41,15 +47,23 @@ export default function ProfileCustomizationTab() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setValidationError(null);
+
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      setValidationError('Please select an image file (JPG, PNG, GIF, etc.)');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size must be less than 5MB');
+      setValidationError('Image size must be less than 5MB. Please choose a smaller image.');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       return;
     }
 
@@ -69,17 +83,26 @@ export default function ProfileCustomizationTab() {
       setProfilePictureUrl(url);
     } catch (error) {
       console.error('Failed to upload image:', error);
-      alert('Failed to upload image. Please try again.');
+      setValidationError('Failed to upload image. Please try again.');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
     }
   };
 
+  const handleRemovePhoto = () => {
+    setProfilePictureUrl(null);
+    setProfilePictureBlob(undefined);
+    setValidationError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const customization: UserProfile['customization'] = {
+    const updates: ProfileCustomization = {
       bio: bio.trim(),
       contactInfo: {
         email: email.trim(),
@@ -88,7 +111,7 @@ export default function ProfileCustomizationTab() {
       profilePicture: profilePictureBlob,
     };
 
-    updateCustomization.mutate(customization);
+    updateCustomization.mutate(updates);
   };
 
   const getUserInitials = () => {
@@ -99,6 +122,14 @@ export default function ProfileCustomizationTab() {
       .join('')
       .toUpperCase();
   };
+
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -135,28 +166,48 @@ export default function ProfileCustomizationTab() {
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading || updateCustomization.isPending}
-                    className="w-full sm:w-auto"
-                  >
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Uploading... {uploadProgress}%
-                      </>
-                    ) : (
-                      <>
-                        <Camera className="mr-2 h-4 w-4" />
-                        {profilePictureUrl ? 'Change Photo' : 'Upload Photo'}
-                      </>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading || updateCustomization.isPending}
+                      className="flex-1 sm:flex-none"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Uploading... {uploadProgress}%
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="mr-2 h-4 w-4" />
+                          {profilePictureUrl ? 'Change Photo' : 'Upload Photo'}
+                        </>
+                      )}
+                    </Button>
+                    {profilePictureUrl && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleRemovePhoto}
+                        disabled={isUploading || updateCustomization.isPending}
+                        className="flex-shrink-0"
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Remove
+                      </Button>
                     )}
-                  </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Recommended: Square image, max 5MB (JPG, PNG, GIF)
                   </p>
+                  {validationError && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{validationError}</AlertDescription>
+                    </Alert>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the infinite full-screen loading state after Internet Identity login by reliably fetching the caller’s user profile and using it to route users to Profile Setup or the dashboard.
+**Goal:** Add profile picture support so authenticated users can upload, save, remove, and see their profile picture across the app.
 
 **Planned changes:**
-- Update the authenticated loading gate in `App.tsx` so it never depends on a profile query that is disabled or can never resolve; render Profile Setup when no profile exists and the Candidate Dashboard when a profile exists.
-- Add backend public methods in `backend/main.mo` to read the caller’s stored profile (returning none/null when missing) and to create/update the caller’s profile, persisted in the existing in-memory `userProfiles` Map.
-- Wire `useGetCallerUserProfile()` to call the new backend read method and enable the query when an actor is available, so `isLoading/isFetched/data` can be used reliably.
+- Backend: Persist a per-caller profile picture blob reference in the user profile record via `setProfileCustomization()` and return it from `getCallerUserProfile()`, stored in stable state for upgrade safety.
+- Frontend: Extend the Profile Customization flow to upload an image, preview it, remove it, and save changes; validate file type (images only) and size (max 5MB) with clear English error messages.
+- Frontend: Display the current user’s avatar in the authenticated app header, using the saved profile picture when present and falling back to initials when not; refresh/invalidate user profile query state after save so updates appear without manual refresh.
 
-**User-visible outcome:** After logging in, users no longer get stuck on an indefinite spinner; they are taken directly to Profile Setup if they haven’t created a profile yet, or to the Candidate Dashboard if they have.
+**User-visible outcome:** Users can upload and preview a profile picture, save it to their profile, remove it to revert to an initials avatar, and see the updated avatar reflected in the app header after saving.

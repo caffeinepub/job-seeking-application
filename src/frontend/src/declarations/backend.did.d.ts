@@ -23,6 +23,14 @@ export interface UserProfile {
   'email' : string,
   'customization' : ProfileCustomization,
 }
+export interface UserProfileInputs {
+  'bio' : string,
+  'contactInfo' : ContactInfo,
+  'name' : string,
+  'role' : UserRole,
+  'email' : string,
+  'profilePictureRef' : [] | [ExternalBlob],
+}
 export type UserRole = { 'employer' : null } |
   { 'candidate' : null };
 export type UserRole__1 = { 'admin' : null } |
@@ -59,8 +67,10 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole__1], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole__1>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfileInputs], undefined>,
+  'setProfileCustomization' : ActorMethod<[ProfileCustomization], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -10,8 +10,9 @@ import Principal "mo:core/Principal";
 import AccessControl "authorization/access-control";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
-import MixinAuthorization "authorization/MixinAuthorization";
 import CareerPath "career-path";
+import Migration "migration";
+import MixinAuthorization "authorization/MixinAuthorization";
 
 actor {
   include MixinStorage();
@@ -21,10 +22,10 @@ actor {
     phone : Text;
   };
 
-  type ProfileCustomization = {
-    profilePicture : ?Storage.ExternalBlob;
+  public type ProfileCustomization = {
     bio : Text;
     contactInfo : ContactInfo;
+    profilePicture : ?Storage.ExternalBlob;
   };
 
   public type UserProfile = {
@@ -32,6 +33,15 @@ actor {
     role : UserRole;
     email : Text;
     customization : ProfileCustomization;
+  };
+
+  public type UserProfileInputs = {
+    name : Text;
+    role : UserRole;
+    email : Text;
+    bio : Text;
+    contactInfo : ContactInfo;
+    profilePictureRef : ?Storage.ExternalBlob;
   };
 
   type ExperienceLevel = {
@@ -459,7 +469,48 @@ actor {
     userProfiles.get(caller);
   };
 
-  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    userProfiles.add(caller, profile);
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(updates : UserProfileInputs) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+
+    let newCustomization = {
+      profilePicture = updates.profilePictureRef;
+      bio = updates.bio;
+      contactInfo = updates.contactInfo;
+    };
+
+    let newProfile = {
+      updates with
+      customization = newCustomization;
+    };
+
+    userProfiles.add(caller, newProfile);
+  };
+
+  public shared ({ caller }) func setProfileCustomization(customization : ProfileCustomization) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update profile customization");
+    };
+
+    switch (userProfiles.get(caller)) {
+      case (?existingProfile) {
+        let updatedProfile = {
+          existingProfile with
+          customization = customization;
+        };
+        userProfiles.add(caller, updatedProfile);
+      };
+      case null {
+        Runtime.trap("Profile not found: Create a profile first");
+      };
+    };
   };
 };
