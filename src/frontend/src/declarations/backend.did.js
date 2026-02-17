@@ -44,6 +44,24 @@ export const UserProfile = IDL.Record({
   'email' : IDL.Text,
   'customization' : ProfileCustomization,
 });
+export const CompanyPageStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
+export const Time = IDL.Int;
+export const CompanyPage = IDL.Record({
+  'status' : CompanyPageStatus,
+  'logo' : IDL.Opt(ExternalBlob),
+  'createdAt' : Time,
+  'createdBy' : IDL.Principal,
+  'banner' : IDL.Opt(ExternalBlob),
+  'description' : IDL.Text,
+  'website' : IDL.Text,
+  'updatedAt' : Time,
+  'companyName' : IDL.Text,
+  'location' : IDL.Text,
+});
 export const UserProfileInputs = IDL.Record({
   'bio' : IDL.Text,
   'contactInfo' : ContactInfo,
@@ -84,11 +102,17 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole__1], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole__1], ['query']),
+  'getCompanyPages' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Principal, CompanyPage))],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfileInputs], [], []),
   'setProfileCustomization' : IDL.Func([ProfileCustomization], [], []),
@@ -130,6 +154,24 @@ export const idlFactory = ({ IDL }) => {
     'email' : IDL.Text,
     'customization' : ProfileCustomization,
   });
+  const CompanyPageStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
+  const Time = IDL.Int;
+  const CompanyPage = IDL.Record({
+    'status' : CompanyPageStatus,
+    'logo' : IDL.Opt(ExternalBlob),
+    'createdAt' : Time,
+    'createdBy' : IDL.Principal,
+    'banner' : IDL.Opt(ExternalBlob),
+    'description' : IDL.Text,
+    'website' : IDL.Text,
+    'updatedAt' : Time,
+    'companyName' : IDL.Text,
+    'location' : IDL.Text,
+  });
   const UserProfileInputs = IDL.Record({
     'bio' : IDL.Text,
     'contactInfo' : ContactInfo,
@@ -170,11 +212,17 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole__1], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole__1], ['query']),
+    'getCompanyPages' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, CompanyPage))],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfileInputs], [], []),
     'setProfileCustomization' : IDL.Func([ProfileCustomization], [], []),

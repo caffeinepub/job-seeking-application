@@ -14,6 +14,19 @@ export class ExternalBlob {
     static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
+export interface CompanyPage {
+    status: CompanyPageStatus;
+    logo?: ExternalBlob;
+    createdAt: Time;
+    createdBy: Principal;
+    banner?: ExternalBlob;
+    description: string;
+    website: string;
+    updatedAt: Time;
+    companyName: string;
+    location: string;
+}
+export type Time = bigint;
 export interface ProfileCustomization {
     bio: string;
     contactInfo: ContactInfo;
@@ -37,6 +50,11 @@ export interface UserProfileInputs {
     email: string;
     profilePictureRef?: ExternalBlob;
 }
+export enum CompanyPageStatus {
+    pending = "pending",
+    approved = "approved",
+    rejected = "rejected"
+}
 export enum UserRole {
     employer = "employer",
     candidate = "candidate"
@@ -50,7 +68,9 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole__1): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole__1>;
+    getCompanyPages(): Promise<Array<[Principal, CompanyPage]>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(updates: UserProfileInputs): Promise<void>;
     setProfileCustomization(customization: ProfileCustomization): Promise<void>;

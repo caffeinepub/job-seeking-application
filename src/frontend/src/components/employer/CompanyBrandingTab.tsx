@@ -62,7 +62,8 @@ export default function CompanyBrandingTab() {
     };
     reader.readAsDataURL(file);
 
-    await uploadLogo.mutateAsync();
+    // Pass the file data to the mutation
+    await uploadLogo.mutateAsync(file);
   };
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +81,8 @@ export default function CompanyBrandingTab() {
     };
     reader.readAsDataURL(file);
 
-    await uploadBanner.mutateAsync();
+    // Pass the file data to the mutation
+    await uploadBanner.mutateAsync(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,10 +93,17 @@ export default function CompanyBrandingTab() {
       return;
     }
 
+    const pageData = {
+      companyName,
+      description,
+      location,
+      website,
+    };
+
     if (companyPage) {
-      await updateCompanyPage.mutateAsync();
+      await updateCompanyPage.mutateAsync(pageData);
     } else {
-      await createCompanyPage.mutateAsync();
+      await createCompanyPage.mutateAsync(pageData);
     }
   };
 
@@ -234,21 +243,21 @@ export default function CompanyBrandingTab() {
               <Label htmlFor="companyName">Company Name *</Label>
               <Input
                 id="companyName"
+                placeholder="Enter company name"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Enter company name"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Company Description *</Label>
+              <Label htmlFor="description">Description *</Label>
               <Textarea
                 id="description"
+                placeholder="Describe your company, mission, and values"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your company, mission, and values"
-                rows={5}
+                rows={4}
                 required
               />
             </div>
@@ -257,9 +266,9 @@ export default function CompanyBrandingTab() {
               <Label htmlFor="location">Location *</Label>
               <Input
                 id="location"
+                placeholder="City, Country"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., San Francisco, CA"
                 required
               />
             </div>
@@ -269,15 +278,16 @@ export default function CompanyBrandingTab() {
               <Input
                 id="website"
                 type="url"
+                placeholder="https://example.com"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
-                placeholder="https://www.example.com"
                 required
               />
             </div>
           </CardContent>
         </Card>
 
+        {/* Submit Button */}
         <div className="flex justify-end gap-4">
           <Button
             type="submit"

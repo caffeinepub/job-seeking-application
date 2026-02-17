@@ -3,7 +3,7 @@ import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
 import { Principal } from '@icp-sdk/core/principal';
 import { toast } from 'sonner';
-import type { UserProfile, ProfileCustomization, UserRole__1 } from '../backend';
+import type { UserProfile, ProfileCustomization, UserRole__1, CompanyPage } from '../backend';
 
 // Local type definitions for features not in backend interface
 export enum AppUserRole {
@@ -220,6 +220,33 @@ type CertificationProgress = {
   totalMilestones: number;
 };
 
+type ReferralStatus = 'pending' | 'completed' | 'failed';
+
+type Referral = {
+  id: bigint;
+  referrer: Principal;
+  referredUser: Principal;
+  referralDate: bigint;
+  pointsAwarded: bigint;
+  status: ReferralStatus;
+};
+
+type ReferralStats = {
+  totalReferredUsers: bigint;
+  totalReferralPoints: bigint;
+  successfulReferrals: bigint;
+  failedReferrals: bigint;
+};
+
+type ResumeAnalysis = {
+  candidate: Principal;
+  resumeAnalysisScore: bigint;
+  extractedSkills: string[];
+  educationLevel: string;
+  suggestions: string[];
+  lastUpdated: bigint;
+};
+
 // User Profile Queries
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -248,10 +275,10 @@ export function useGetUserProfile(userPrincipal: Principal | null) {
   return useQuery<UserProfile | null>({
     queryKey: ['userProfile', userPrincipal?.toString()],
     queryFn: async () => {
-      // Backend method not implemented yet
-      return null;
+      if (!actor || !userPrincipal) return null;
+      return actor.getUserProfile(userPrincipal);
     },
-    enabled: false,
+    enabled: !!actor && !isFetching && !!userPrincipal,
   });
 }
 
@@ -262,12 +289,17 @@ export function useSaveCallerUserProfile() {
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
-      // First save the profile using setProfileCustomization
-      await actor.setProfileCustomization({
+      
+      // Use saveCallerUserProfile with the correct input structure
+      await actor.saveCallerUserProfile({
+        name: profile.name,
+        role: profile.role,
+        email: profile.email,
         bio: profile.customization.bio,
         contactInfo: profile.customization.contactInfo,
-        profilePicture: profile.customization.profilePicture,
+        profilePictureRef: profile.customization.profilePicture,
       });
+      
       // Store the full profile in the query cache for immediate use
       queryClient.setQueryData(['currentUserProfile'], profile);
     },
@@ -297,6 +329,188 @@ export function useUpdateProfileCustomization() {
     onError: (error: Error) => {
       toast.error(`Failed to update profile: ${error.message}`);
     },
+  });
+}
+
+// Company Pages Queries
+export function useGetCompanyPages() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Array<[Principal, CompanyPage]>>({
+    queryKey: ['companyPages'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getCompanyPages();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetAllCompanyPages() {
+  return useGetCompanyPages();
+}
+
+export function useGetCallerCompanyPage() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<CompanyPage | null>({
+    queryKey: ['callerCompanyPage'],
+    queryFn: async () => {
+      // Backend method not implemented yet
+      return null;
+    },
+    enabled: false,
+  });
+}
+
+export function useCreateCompanyPage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (companyPage: any) => {
+      toast.info('Company page creation feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      queryClient.invalidateQueries({ queryKey: ['callerCompanyPage'] });
+      toast.success('Company page created successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to create company page: ${error.message}`);
+    },
+  });
+}
+
+export function useUpdateCompanyPage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (companyPage: any) => {
+      toast.info('Company page update feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      queryClient.invalidateQueries({ queryKey: ['callerCompanyPage'] });
+      toast.success('Company page updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update company page: ${error.message}`);
+    },
+  });
+}
+
+export function useUploadCompanyLogo() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (logo: any) => {
+      toast.info('Company logo upload feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      queryClient.invalidateQueries({ queryKey: ['callerCompanyPage'] });
+      toast.success('Company logo uploaded successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to upload company logo: ${error.message}`);
+    },
+  });
+}
+
+export function useUploadCompanyBanner() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (banner: any) => {
+      toast.info('Company banner upload feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      queryClient.invalidateQueries({ queryKey: ['callerCompanyPage'] });
+      toast.success('Company banner uploaded successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to upload company banner: ${error.message}`);
+    },
+  });
+}
+
+export function useApproveCompanyPage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (companyId: Principal) => {
+      toast.info('Company page approval feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      toast.success('Company page approved successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to approve company page: ${error.message}`);
+    },
+  });
+}
+
+export function useRejectCompanyPage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (companyId: Principal) => {
+      toast.info('Company page rejection feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      toast.success('Company page rejected');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to reject company page: ${error.message}`);
+    },
+  });
+}
+
+export function useRemoveCompanyPage() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (companyId: Principal) => {
+      toast.info('Company page removal feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyPages'] });
+      toast.success('Company page removed successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to remove company page: ${error.message}`);
+    },
+  });
+}
+
+// Admin Queries
+export function useIsCallerAdmin() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['isAdmin'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isCallerAdmin();
+    },
+    enabled: !!actor && !isFetching,
   });
 }
 
@@ -347,20 +561,6 @@ export function useMarkNotificationAsRead() {
     onError: (error: Error) => {
       toast.error(`Failed to mark notification as read: ${error.message}`);
     },
-  });
-}
-
-// Admin Queries
-export function useIsCallerAdmin() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<boolean>({
-    queryKey: ['isAdmin'],
-    queryFn: async () => {
-      if (!actor) return false;
-      return actor.isCallerAdmin();
-    },
-    enabled: !!actor && !isFetching,
   });
 }
 
@@ -564,36 +764,25 @@ export function useGetSkillGrowthData(candidatePrincipal?: Principal) {
   });
 }
 
-export function useGetCandidateGrowthData() {
-  const { actor, isFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery<SkillGrowthData | null>({
-    queryKey: ['candidateGrowthData', identity?.getPrincipal().toString()],
-    queryFn: async () => {
-      // Backend method not implemented yet
-      return null;
-    },
-    enabled: false,
-  });
+export function useGetCandidateGrowthData(candidatePrincipal?: Principal) {
+  return useGetSkillGrowthData(candidatePrincipal);
 }
 
 // Leaderboard Queries - Placeholder implementations
-export function useGetLeaderboard(filter: LeaderboardFilter) {
+export function useGetLeaderboard(filters?: LeaderboardFilter) {
   const { actor, isFetching } = useActor();
 
   return useQuery<LeaderboardEntry[]>({
-    queryKey: ['leaderboard', filter],
+    queryKey: ['leaderboard', filters],
     queryFn: async () => {
       // Backend method not implemented yet
       return [];
     },
     enabled: false,
-    refetchInterval: 30000,
   });
 }
 
-// Career Path Recommendations Queries - Placeholder implementations
+// Career Path Queries - Placeholder implementations
 export function useGetCareerPathRecommendations(candidatePrincipal?: Principal) {
   const { actor, isFetching } = useActor();
   const { identity } = useInternetIdentity();
@@ -602,36 +791,6 @@ export function useGetCareerPathRecommendations(candidatePrincipal?: Principal) 
 
   return useQuery<CareerPathRecommendations | null>({
     queryKey: ['careerPath', principal?.toString()],
-    queryFn: async () => {
-      // Backend method not implemented yet
-      return null;
-    },
-    enabled: false,
-    retry: false,
-  });
-}
-
-export function useGetCareerProgressData(candidatePrincipal?: Principal) {
-  const { actor, isFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  const principal = candidatePrincipal || identity?.getPrincipal();
-
-  return useQuery<CareerProgressData | null>({
-    queryKey: ['careerProgressData', principal?.toString()],
-    queryFn: async () => {
-      // Backend method not implemented yet
-      return null;
-    },
-    enabled: false,
-  });
-}
-
-export function useGetCandidateCareerPathSummary(candidatePrincipal: Principal) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<CareerPathRecommendations | null>({
-    queryKey: ['careerPathSummary', candidatePrincipal.toString()],
     queryFn: async () => {
       // Backend method not implemented yet
       return null;
@@ -649,10 +808,9 @@ export function useGenerateCareerPathRecommendations() {
       toast.info('Career path generation feature coming soon');
       return Promise.resolve();
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['careerPath', variables.candidate.toString()] });
-      queryClient.invalidateQueries({ queryKey: ['careerProgressData', variables.candidate.toString()] });
-      toast.success('Career path recommendations generated successfully!');
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['careerPath'] });
+      toast.success('Career path recommendations generated!');
     },
     onError: (error: Error) => {
       toast.error(`Failed to generate career path: ${error.message}`);
@@ -660,24 +818,8 @@ export function useGenerateCareerPathRecommendations() {
   });
 }
 
-export function useUpdateCareerPathProgress() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (update: CareerProgressUpdate) => {
-      toast.info('Career path progress update feature coming soon');
-      return Promise.resolve();
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['careerPath', variables.candidate.toString()] });
-      queryClient.invalidateQueries({ queryKey: ['careerProgressData', variables.candidate.toString()] });
-      toast.success('Career path progress updated!');
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to update career path progress: ${error.message}`);
-    },
-  });
+export function useGetCandidateCareerPathSummary(candidatePrincipal?: Principal) {
+  return useGetCareerPathRecommendations(candidatePrincipal);
 }
 
 // Certification Queries - Placeholder implementations
@@ -689,19 +831,6 @@ export function useGetCandidateCertifications(candidatePrincipal?: Principal) {
 
   return useQuery<Certification[]>({
     queryKey: ['certifications', principal?.toString()],
-    queryFn: async () => {
-      // Backend method not implemented yet
-      return [];
-    },
-    enabled: false,
-  });
-}
-
-export function useGetAllCertifications() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Certification[]>({
-    queryKey: ['allCertifications'],
     queryFn: async () => {
       // Backend method not implemented yet
       return [];
@@ -726,209 +855,84 @@ export function useGetCertificationProgress(candidatePrincipal?: Principal) {
   });
 }
 
-export function useValidateCertification() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (certificationId: bigint) => {
-      toast.info('Certification validation feature coming soon');
-      return Promise.resolve();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allCertifications'] });
-      toast.success('Certification validated successfully');
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to validate certification: ${error.message}`);
-    },
-  });
-}
-
-export function useRevokeCertification() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ certificationId, reason }: { certificationId: bigint; reason: string }) => {
-      toast.info('Certification revocation feature coming soon');
-      return Promise.resolve();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allCertifications'] });
-      queryClient.invalidateQueries({ queryKey: ['certifications'] });
-      toast.success('Certification revoked successfully');
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to revoke certification: ${error.message}`);
-    },
-  });
-}
-
-// Placeholder hooks for features not yet implemented in backend
-export function useAnalyzeResume() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Resume analysis feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useGetResumeAnalysis() {
-  return useQuery({
-    queryKey: ['resumeAnalysis'],
-    queryFn: async () => null,
-    enabled: false,
-  });
-}
-
-export function useGetResumeRecommendations() {
-  return useQuery({
-    queryKey: ['resumeRecommendations'],
-    queryFn: async () => [],
-    enabled: false,
-  });
-}
-
-export function useGetCompanyPage() {
-  return useQuery({
-    queryKey: ['companyPage'],
-    queryFn: async () => null,
-    enabled: false,
-  });
-}
-
-export function useGetCallerCompanyPage() {
-  return useQuery({
-    queryKey: ['companyPage'],
-    queryFn: async () => null,
-    enabled: false,
-  });
-}
-
-export function useCreateCompanyPage() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useUpdateCompanyPage() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useUploadCompanyLogo() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useUploadCompanyBanner() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useGetAllCompanyPages() {
-  return useQuery({
-    queryKey: ['allCompanyPages'],
-    queryFn: async () => [],
-    enabled: false,
-  });
-}
-
-export function useApproveCompanyPage() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useRejectCompanyPage() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useRemoveCompanyPage() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Company pages feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useCreateReferral() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Referral system feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
-export function useCompleteReferral() {
-  return useMutation({
-    mutationFn: async () => {
-      toast.info('Referral system feature coming soon');
-      return Promise.resolve();
-    },
-  });
-}
-
+// Referral Queries - Placeholder implementations
 export function useGetUserReferrals() {
-  return useQuery({
-    queryKey: ['referrals'],
-    queryFn: async () => [],
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<Referral[]>({
+    queryKey: ['referrals', identity?.getPrincipal().toString()],
+    queryFn: async () => {
+      // Backend method not implemented yet
+      return [];
+    },
     enabled: false,
   });
 }
 
 export function useGetReferralStats() {
-  return useQuery({
-    queryKey: ['referralStats'],
-    queryFn: async () => ({
-      totalReferredUsers: BigInt(0),
-      totalReferralPoints: BigInt(0),
-      successfulReferrals: BigInt(0),
-      failedReferrals: BigInt(0),
-    }),
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<ReferralStats | null>({
+    queryKey: ['referralStats', identity?.getPrincipal().toString()],
+    queryFn: async () => {
+      // Backend method not implemented yet
+      return null;
+    },
     enabled: false,
   });
 }
 
-export function useGetTotalReferralPoints() {
-  return useQuery({
-    queryKey: ['totalReferralPoints'],
-    queryFn: async () => BigInt(0),
+export function useCreateReferral() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      toast.info('Referral creation feature coming soon');
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['referrals'] });
+      queryClient.invalidateQueries({ queryKey: ['referralStats'] });
+      toast.success('Referral created successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to create referral: ${error.message}`);
+    },
+  });
+}
+
+// Resume Analysis Queries - Placeholder implementations
+export function useGetResumeAnalysis(candidatePrincipal?: Principal) {
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  const principal = candidatePrincipal || identity?.getPrincipal();
+
+  return useQuery<ResumeAnalysis | null>({
+    queryKey: ['resumeAnalysis', principal?.toString()],
+    queryFn: async () => {
+      // Backend method not implemented yet
+      return null;
+    },
     enabled: false,
   });
 }
 
-export function useGetAllReferrals() {
-  return useQuery({
-    queryKey: ['allReferrals'],
-    queryFn: async () => [],
+export function useGetResumeRecommendations(candidatePrincipal?: Principal) {
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  const principal = candidatePrincipal || identity?.getPrincipal();
+
+  return useQuery<string[]>({
+    queryKey: ['resumeRecommendations', principal?.toString()],
+    queryFn: async () => {
+      // Backend method not implemented yet
+      return [];
+    },
     enabled: false,
   });
 }

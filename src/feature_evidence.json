@@ -2,11 +2,55 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-profile-customization-ui-flow-so-users-can-upload-preview-remove-and-save-a-profile-picture-and-the-saved-value-reloads-correctly-from-getcalleruserprofile",
-      "featureTitle": "Update the Profile Customization UI flow so users can upload, preview, remove, and save a profile picture, and the saved value reloads correctly from getCallerUserProfile().",
+      "featureId": "feature-make-the-app-compile-and-run-without-errors-by-identifying-and-fixing-any-frontend-build-time-or-runtime-crashes-caused-by-missing-empty-react-component-modules-missing-exports-or-unsafe-calls-on-optional-values-e-g-calling-methods-on-optional-blob-references",
+      "featureTitle": "Make the app compile and run without errors by identifying and fixing any frontend build-time or runtime crashes caused by missing/empty React component modules, missing exports, or unsafe calls on optional values (e.g., calling methods on optional blob references).",
       "files": [
-        "frontend/src/components/ProfileCustomizationTab.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/MessagesTab.tsx",
+        "frontend/src/components/NotificationDropdown.tsx",
+        "frontend/src/components/SimulationMode.tsx",
+        "frontend/src/components/candidate/AnalyticsTab.tsx",
+        "frontend/src/components/candidate/CandidateInterviewsTab.tsx",
+        "frontend/src/components/candidate/FeedbackViewTab.tsx",
+        "frontend/src/components/candidate/JobRecommendationsTab.tsx",
+        "frontend/src/components/candidate/MyApplicationsTab.tsx",
+        "frontend/src/components/candidate/MyProfileTab.tsx",
+        "frontend/src/components/candidate/SkillTestsTab.tsx",
+        "frontend/src/components/candidate/TakeTestModal.tsx",
+        "frontend/src/components/employer/AnalyticsTab.tsx",
+        "frontend/src/components/employer/ApplicationsTab.tsx",
+        "frontend/src/components/employer/AssessmentsTab.tsx",
+        "frontend/src/components/employer/CreateAssessmentModal.tsx",
+        "frontend/src/components/employer/CreateJobModal.tsx",
+        "frontend/src/components/employer/EditInterviewModal.tsx",
+        "frontend/src/components/employer/EditJobModal.tsx",
+        "frontend/src/components/employer/FeedbackModal.tsx",
+        "frontend/src/components/employer/InterviewsTab.tsx",
+        "frontend/src/components/employer/JobListingsTab.tsx",
+        "frontend/src/components/employer/RecommendationsTab.tsx",
+        "frontend/src/components/employer/ScheduleInterviewModal.tsx",
+        "frontend/src/components/employer/TestResultsModal.tsx",
+        "frontend/src/pages/LandingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-authenticated-routing-so-the-correct-dashboard-is-shown-based-on-the-signed-in-user-s-role-candidate-users-see-candidatedashboard-employer-users-see-employerdashboard-and-admins-see-admindashboard-when-admin-detection-is-available",
+      "featureTitle": "Fix the authenticated routing so the correct dashboard is shown based on the signed-in user’s role: candidate users see CandidateDashboard, employer users see EmployerDashboard, and admins see AdminDashboard (when admin detection is available).",
+      "files": [
+        "frontend/src/App.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,6 +64,30 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-backend-methods-used-by-the-frontend-s-query-mutation-hooks-exist-and-match-the-generated-candid-interface-in-particular-user-profile-fetch-save-customization-company-pages-list-retrieval-if-referenced-and-admin-detection-if-referenced-add-missing-backend-functions-or-adjust-frontend-usage-so-calls-do-not-fail-at-runtime",
+      "featureTitle": "Ensure backend methods used by the frontend’s query/mutation hooks exist and match the generated candid interface (in particular: user profile fetch/save/customization, company pages list retrieval if referenced, and admin detection if referenced). Add missing backend functions or adjust frontend usage so calls do not fail at runtime.",
+      "files": [
+        "frontend/src/components/ProfileSetupModal.tsx",
+        "frontend/src/components/employer/CompanyBrandingTab.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/LandingPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

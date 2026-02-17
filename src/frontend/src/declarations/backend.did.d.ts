@@ -10,6 +10,21 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface CompanyPage {
+  'status' : CompanyPageStatus,
+  'logo' : [] | [ExternalBlob],
+  'createdAt' : Time,
+  'createdBy' : Principal,
+  'banner' : [] | [ExternalBlob],
+  'description' : string,
+  'website' : string,
+  'updatedAt' : Time,
+  'companyName' : string,
+  'location' : string,
+}
+export type CompanyPageStatus = { 'pending' : null } |
+  { 'approved' : null } |
+  { 'rejected' : null };
 export interface ContactInfo { 'email' : string, 'phone' : string }
 export type ExternalBlob = Uint8Array;
 export interface ProfileCustomization {
@@ -17,6 +32,7 @@ export interface ProfileCustomization {
   'contactInfo' : ContactInfo,
   'profilePicture' : [] | [ExternalBlob],
 }
+export type Time = bigint;
 export interface UserProfile {
   'name' : string,
   'role' : UserRole,
@@ -67,7 +83,9 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole__1], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole__1>,
+  'getCompanyPages' : ActorMethod<[], Array<[Principal, CompanyPage]>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isAdmin' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfileInputs], undefined>,
   'setProfileCustomization' : ActorMethod<[ProfileCustomization], undefined>,

@@ -1,71 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Add profile picture support for user profiles",
-  "priority": "normal",
+  "title": "Repair app build/runtime issues and restore correct role-based dashboards",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Persist each authenticated user’s profile picture selection in the backend user profile record (stored per caller Principal) so it is returned by getCallerUserProfile() after being saved via setProfileCustomization().",
-      "target": "backend",
+      "text": "Make the app compile and run without errors by identifying and fixing any frontend build-time or runtime crashes caused by missing/empty React component modules, missing exports, or unsafe calls on optional values (e.g., calling methods on optional blob references).",
+      "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Add the feature of profile picture"
+          "Repair the app"
         ]
       },
       "acceptanceCriteria": [
-        "When the caller saves a profile picture via setProfileCustomization(profilePictureRef = some blob ref), subsequent getCallerUserProfile() calls return customization.profilePicture = that same blob reference.",
-        "When the caller removes their profile picture and saves (profilePictureRef = null), subsequent getCallerUserProfile() calls return customization.profilePicture = null.",
-        "The profile picture reference is stored in stable state so it survives canister upgrades."
+        "`frontend` builds successfully with TypeScript with no missing-module or missing-export errors.",
+        "App loads to the Landing Page when logged out and does not crash when logged in/out.",
+        "Any UI that reads optional blob fields (e.g., company logo/banner, user profile picture) guards against absent values and does not throw at runtime."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update the Profile Customization UI flow so users can upload, preview, remove, and save a profile picture, and the saved value reloads correctly from getCallerUserProfile().",
+      "text": "Fix the authenticated routing so the correct dashboard is shown based on the signed-in user’s role: candidate users see CandidateDashboard, employer users see EmployerDashboard, and admins see AdminDashboard (when admin detection is available).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Add the feature of profile picture"
+          "Repair the app"
         ]
       },
       "acceptanceCriteria": [
-        "The Profile Customization screen allows selecting an image file, shows a preview avatar, and blocks non-image files and images larger than 5MB with clear error messaging.",
-        "Clicking “Remove” clears the preview and, after clicking “Save Changes”, the backend is updated so reloading the page shows the fallback avatar (initials) again.",
-        "After successfully saving, the UI reflects the persisted profile picture by reloading/refreshing the current user profile query state (no manual refresh required)."
+        "When a signed-in user has role `#candidate`, the Candidate Dashboard is shown after profile setup.",
+        "When a signed-in user has role `#employer`, the Employer Dashboard is shown after profile setup.",
+        "When the signed-in user is an admin, the Admin Dashboard is shown (or a clear fallback is used if admin status cannot be determined)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Show the current user’s profile picture (or initials fallback) in the main authenticated app header wherever the signed-in user identity is displayed.",
-      "target": "frontend",
+      "text": "Ensure backend methods used by the frontend’s query/mutation hooks exist and match the generated candid interface (in particular: user profile fetch/save/customization, company pages list retrieval if referenced, and admin detection if referenced). Add missing backend functions or adjust frontend usage so calls do not fail at runtime.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Add the feature of profile picture"
+          "Repair the app"
         ]
       },
       "acceptanceCriteria": [
-        "When the current user has a saved profile picture, the header displays it as an avatar image.",
-        "When the user has no saved profile picture, the header displays a fallback avatar with the user’s initials.",
-        "Updating the profile picture via the Profile Customization screen causes the header avatar to update after save (within the normal React Query refresh/invalidation flow)."
+        "All frontend React Query hooks invoked by default app flows (Landing Page, Header, Profile Setup, dashboards) have corresponding backend actor methods and do not fail due to missing canister methods.",
+        "Logged-in flow can successfully fetch `getCallerUserProfile()` and complete profile setup/customization without trapping due to absent methods."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo.",
-    "Do not edit any files under frontend/src/components/ui or any frontend immutablePaths listed in SYSTEM_CONTEXT; compose those components instead.",
-    "Use English for any user-facing text."
+    "Do not edit files under frontend/src/components/ui (read-only Shadcn components).",
+    "Do not edit frontend immutable hook entry files listed in SYSTEM_CONTEXT (compose around them instead).",
+    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo changes if state schema changes are required."
   ],
   "nonGoals": [
-    "Building a public user directory or viewing other users’ profile pictures.",
-    "Third-party image hosting, external databases, or external auth providers beyond Internet Identity."
+    "Implementing the placeholder/empty tabs’ full product functionality (analytics, messaging, interviews, assessments, etc.).",
+    "Adding third-party auth providers or external databases.",
+    "Adding real-time features (WebSockets/push notifications)."
   ],
   "imageRequirements": {
     "required": [],

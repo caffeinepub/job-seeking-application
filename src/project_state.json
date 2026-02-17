@@ -3,43 +3,38 @@
   "projectStateVersion": 3,
   "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "App draft/preview frequently expires, requiring repeated rebuild/redeploy cycles."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-update-the-profile-customization-ui-flow-so-users-can-upload-preview-remove-and-save-a-profile-picture-and-the-saved-value-reloads-correctly-from-getcalleruserprofile",
-      "title": "Update the Profile Customization UI flow so users can upload, preview, remove, and save a profile picture, and the saved value reloads correctly from getCallerUserProfile().",
+      "id": "feature-make-the-app-compile-and-run-without-errors-by-identifying-and-fixing-any-frontend-build-time-or-runtime-crashes-caused-by-missing-empty-react-component-modules-missing-exports-or-unsafe-calls-on-optional-values-e-g-calling-methods-on-optional-blob-references",
+      "title": "Make the app compile and run without errors by identifying and fixing any frontend build-time or runtime crashes caused by missing/empty React component modules, missing exports, or unsafe calls on optional values (e.g., calling methods on optional blob references).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-authenticated-routing-so-the-correct-dashboard-is-shown-based-on-the-signed-in-user-s-role-candidate-users-see-candidatedashboard-employer-users-see-employerdashboard-and-admins-see-admindashboard-when-admin-detection-is-available",
+      "title": "Fix the authenticated routing so the correct dashboard is shown based on the signed-in user’s role: candidate users see CandidateDashboard, employer users see EmployerDashboard, and admins see AdminDashboard (when admin detection is available).",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
-    }
-  ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Add profile picture/avatar support for user profiles",
-      "reqIds": [],
-      "status": "pending"
     },
     {
-      "id": "AR-2",
-      "summary": "Persist each authenticated user’s profile picture selection in the backend user profile record (stored per caller Principal) so it is returned by getCallerUserProfile() after being saved via setProfileCustomization().",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Show the current user’s profile picture (or initials fallback) in the main authenticated app header wherever the signed-in user identity is displayed.",
+      "id": "feature-ensure-backend-methods-used-by-the-frontend-s-query-mutation-hooks-exist-and-match-the-generated-candid-interface-in-particular-user-profile-fetch-save-customization-company-pages-list-retrieval-if-referenced-and-admin-detection-if-referenced-add-missing-backend-functions-or-adjust-frontend-usage-so-calls-do-not-fail-at-runtime",
+      "title": "Ensure backend methods used by the frontend’s query/mutation hooks exist and match the generated candid interface (in particular: user profile fetch/save/customization, company pages list retrieval if referenced, and admin detection if referenced). Add missing backend functions or adjust frontend usage so calls do not fail at runtime.",
       "reqIds": [
         "REQ-3"
       ],
-      "status": "pending"
+      "version": 1
     }
   ],
-  "projectName": "Add profile picture support for user profiles",
+  "new_feature_requests": [],
+  "projectName": "Repair app build/runtime issues and restore correct role-based dashboards",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

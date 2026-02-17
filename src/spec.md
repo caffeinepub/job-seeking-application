@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add profile picture support so authenticated users can upload, save, remove, and see their profile picture across the app.
+**Goal:** Repair build/runtime issues and restore correct role-based dashboard routing so the app reliably compiles, loads, and routes users to the correct dashboard based on role.
 
 **Planned changes:**
-- Backend: Persist a per-caller profile picture blob reference in the user profile record via `setProfileCustomization()` and return it from `getCallerUserProfile()`, stored in stable state for upgrade safety.
-- Frontend: Extend the Profile Customization flow to upload an image, preview it, remove it, and save changes; validate file type (images only) and size (max 5MB) with clear English error messages.
-- Frontend: Display the current user’s avatar in the authenticated app header, using the saved profile picture when present and falling back to initials when not; refresh/invalidate user profile query state after save so updates appear without manual refresh.
+- Fix frontend build-time and runtime crashes caused by missing/empty React modules, missing exports, and unsafe usage of optional values (e.g., optional blob/logo/banner/profile picture fields).
+- Correct authenticated routing to show CandidateDashboard for `#candidate`, EmployerDashboard for `#employer`, and AdminDashboard for admins (with a clear fallback if admin status cannot be determined).
+- Ensure backend actor methods referenced by the frontend’s query/mutation hooks exist and match the generated candid interface (including user profile fetch/save/customization, any referenced company pages list retrieval, and admin detection where referenced), adjusting frontend usage or adding missing backend methods to prevent runtime failures.
 
-**User-visible outcome:** Users can upload and preview a profile picture, save it to their profile, remove it to revert to an initials avatar, and see the updated avatar reflected in the app header after saving.
+**User-visible outcome:** The app builds successfully, loads the Landing Page when logged out, doesn’t crash during login/logout, completes profile setup, and routes signed-in users to the correct dashboard based on their role.

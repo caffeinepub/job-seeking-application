@@ -22,22 +22,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import type { Principal } from '@icp-sdk/core/principal';
+import type { CompanyPage } from '../../backend';
 
-// Local type definitions since backend types are not available
+// Local type definitions
 type CompanyPageStatus = 'pending' | 'approved' | 'rejected';
-
-interface CompanyPage {
-  companyName: string;
-  logo?: { getDirectURL: () => string };
-  banner?: { getDirectURL: () => string };
-  description: string;
-  location: string;
-  website: string;
-  status: CompanyPageStatus;
-  createdBy: { toString: () => string };
-  createdAt: bigint;
-  updatedAt: bigint;
-}
 
 export default function CompanyPagesTab() {
   const { data: companyPages = [], isLoading } = useGetAllCompanyPages();
@@ -48,7 +37,13 @@ export default function CompanyPagesTab() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
 
-  const filteredCompanyPages = (companyPages as CompanyPage[]).filter((page) => {
+  // Transform the tuple array to a more usable format
+  const companyPagesWithPrincipal = companyPages.map(([principal, page]) => ({
+    principal,
+    ...page,
+  }));
+
+  const filteredCompanyPages = companyPagesWithPrincipal.filter((page) => {
     const matchesSearch =
       page.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       page.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -72,16 +67,16 @@ export default function CompanyPagesTab() {
     }
   };
 
-  const handleApprove = async (companyId: string) => {
-    await approveCompanyPage.mutateAsync(companyId as any);
+  const handleApprove = async (principal: Principal) => {
+    await approveCompanyPage.mutateAsync(principal);
   };
 
-  const handleReject = async (companyId: string) => {
-    await rejectCompanyPage.mutateAsync(companyId as any);
+  const handleReject = async (principal: Principal) => {
+    await rejectCompanyPage.mutateAsync(principal);
   };
 
-  const handleRemove = async (companyId: string) => {
-    await removeCompanyPage.mutateAsync(companyId as any);
+  const handleRemove = async (principal: Principal) => {
+    await removeCompanyPage.mutateAsync(principal);
   };
 
   if (isLoading) {
@@ -166,7 +161,7 @@ export default function CompanyPagesTab() {
       ) : (
         <div className="grid gap-6">
           {filteredCompanyPages.map((page) => (
-            <Card key={page.createdBy.toString()}>
+            <Card key={page.principal.toString()}>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
@@ -180,7 +175,7 @@ export default function CompanyPagesTab() {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         {page.companyName}
-                        {getStatusBadge(page.status)}
+                        {getStatusBadge(page.status as CompanyPageStatus)}
                       </CardTitle>
                       <CardDescription className="mt-1">
                         {page.location}
@@ -216,7 +211,7 @@ export default function CompanyPagesTab() {
                     <>
                       <Button
                         size="sm"
-                        onClick={() => handleApprove(page.createdBy.toString())}
+                        onClick={() => handleApprove(page.principal)}
                         disabled={approveCompanyPage.isPending}
                         className="gap-2"
                       >
@@ -226,7 +221,7 @@ export default function CompanyPagesTab() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleReject(page.createdBy.toString())}
+                        onClick={() => handleReject(page.principal)}
                         disabled={rejectCompanyPage.isPending}
                         className="gap-2"
                       >
@@ -238,7 +233,7 @@ export default function CompanyPagesTab() {
                   {page.status === 'rejected' && (
                     <Button
                       size="sm"
-                      onClick={() => handleApprove(page.createdBy.toString())}
+                      onClick={() => handleApprove(page.principal)}
                       disabled={approveCompanyPage.isPending}
                       className="gap-2"
                     >
@@ -250,7 +245,7 @@ export default function CompanyPagesTab() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleReject(page.createdBy.toString())}
+                      onClick={() => handleReject(page.principal)}
                       disabled={rejectCompanyPage.isPending}
                       className="gap-2"
                     >
@@ -275,7 +270,7 @@ export default function CompanyPagesTab() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => handleRemove(page.createdBy.toString())}
+                          onClick={() => handleRemove(page.principal)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                           Remove

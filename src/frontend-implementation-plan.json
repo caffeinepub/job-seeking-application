@@ -1,42 +1,212 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Profile picture upload, persistence refresh, and header avatar rendering",
+  "title": "Repair frontend build/runtime stability and restore role-based dashboards",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Enhance Profile Customization to upload/preview/remove/save a profile picture with validation and automatic reload from the current user profile query.",
+      "id": "REQ-1",
+      "summary": "Fix frontend build-time and runtime crashes caused by missing/empty modules, missing exports, and unsafe access to optional values (especially optional ExternalBlob fields).",
       "acceptanceCriteria": [
-        "The Profile Customization screen allows selecting an image file, shows a preview avatar, and blocks non-image files and images larger than 5MB with clear error messaging.",
-        "Clicking “Remove” clears the preview and, after clicking “Save Changes”, the backend is updated so reloading the page shows the fallback avatar (initials) again.",
-        "After successfully saving, the UI reflects the persisted profile picture by reloading/refreshing the current user profile query state (no manual refresh required)."
+        "`frontend` builds successfully with TypeScript with no missing-module or missing-export errors.",
+        "App loads to the Landing Page when logged out and does not crash when logged in/out.",
+        "Any UI that reads optional blob fields (e.g., company logo/banner, user profile picture) guards against absent values and does not throw at runtime."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/ProfileCustomizationTab.tsx",
+          "path": "frontend/src/components/candidate/AnalyticsTab.tsx",
           "operation": "modify",
-          "description": "Update the profile picture section to use the blob-storage ExternalBlob capability for image upload/preview via getDirectURL(), add inline (non-alert) validation errors for non-image files and >5MB images, ensure remove+save sends a cleared picture value, and ensure local state fully re-syncs from getCallerUserProfile() (including clearing state when no picture is returned). Verify the component's usage instructions before implementing."
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/candidate/CandidateInterviewsTab.tsx",
           "operation": "modify",
-          "description": "Align the profile customization mutation types/payload with the generated backend types, and ensure React Query invalidation/refetch of ['currentUserProfile'] happens on success so the saved profile picture reloads into the UI state. Verify the component's usage instructions before implementing."
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/candidate/FeedbackViewTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/candidate/JobRecommendationsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/candidate/MyApplicationsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/candidate/MyProfileTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/candidate/SkillTestsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/candidate/TakeTestModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/AnalyticsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/ApplicationsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/AssessmentsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/CreateAssessmentModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/CreateJobModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/EditInterviewModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/EditJobModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/FeedbackModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/InterviewsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/JobListingsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/RecommendationsTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/ScheduleInterviewModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/employer/TestResultsModal.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/MessagesTab.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/NotificationDropdown.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/components/SimulationMode.tsx",
+          "operation": "modify",
+          "description": "Replace the empty file with a minimal valid React component export (placeholder UI) so imports do not fail at build/runtime."
+        },
+        {
+          "path": "frontend/src/pages/LandingPage.tsx",
+          "operation": "modify",
+          "description": "Harden featured companies rendering to avoid unsafe calls on optional blob fields; ensure any use of ExternalBlob methods is guarded (e.g., only call getDirectURL() when the blob is present)."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Ensure profile-picture rendering remains fully guarded against missing customization/profilePicture values and cannot throw during rapid login/logout cycles."
+        },
+        {
+          "path": "frontend/src/components/ProfileCustomizationTab.tsx",
+          "operation": "modify",
+          "description": "Ensure any ExternalBlob usage remains guarded and that state resets correctly when the backend returns no profile picture (avoid stale URL/blob references). Use the blob-storage ExternalBlob capability via getDirectURL()/fromBytes() safely. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Fix authenticated routing so the post-setup dashboard is selected by role (candidate/employer/admin with fallback).",
+      "acceptanceCriteria": [
+        "When a signed-in user has role `#candidate`, the Candidate Dashboard is shown after profile setup.",
+        "When a signed-in user has role `#employer`, the Employer Dashboard is shown after profile setup.",
+        "When the signed-in user is an admin, the Admin Dashboard is shown (or a clear fallback is used if admin status cannot be determined)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Update the authenticated render branch to choose AdminDashboard (when admin detection says admin), otherwise choose CandidateDashboard vs EmployerDashboard based on the signed-in user profile role; keep the existing profile-setup gating behavior."
+        },
+        {
+          "path": "frontend/src/pages/EmployerDashboard.tsx",
+          "operation": "modify",
+          "description": "Verify the employer dashboard can render as the authenticated landing view without relying on missing/empty tab modules; adjust imports/usage if necessary so the dashboard mounts cleanly."
+        },
+        {
+          "path": "frontend/src/pages/CandidateDashboard.tsx",
+          "operation": "modify",
+          "description": "Verify the candidate dashboard can render as the authenticated landing view without relying on missing/empty tab modules; adjust imports/usage if necessary so the dashboard mounts cleanly."
+        },
+        {
+          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "operation": "modify",
+          "description": "Ensure the admin dashboard can render as the authenticated landing view when admin is detected; if admin status cannot be determined, ensure a clear non-crashing fallback path exists in the app-level routing."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Render the current user’s avatar in the authenticated header using the saved profile picture (or initials fallback) and update it after profile changes through query refresh.",
+      "summary": "Align frontend query/mutation hooks and default flows with the generated backend interface so actor calls do not fail at runtime (profile fetch/save/customization, company pages list retrieval, and admin detection when referenced).",
       "acceptanceCriteria": [
-        "When the current user has a saved profile picture, the header displays it as an avatar image.",
-        "When the user has no saved profile picture, the header displays a fallback avatar with the user’s initials.",
-        "Updating the profile picture via the Profile Customization screen causes the header avatar to update after save (within the normal React Query refresh/invalidation flow)."
+        "All frontend React Query hooks invoked by default app flows (Landing Page, Header, Profile Setup, dashboards) have corresponding backend actor methods and do not fail due to missing canister methods.",
+        "Logged-in flow can successfully fetch `getCallerUserProfile()` and complete profile setup/customization without trapping due to absent methods."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Header.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Ensure the header avatar uses the profile picture direct URL when present and otherwise reliably falls back to initials, and that it reflects updates after Profile Customization saves via the existing React Query current user profile refresh flow. Verify the component's usage instructions before implementing."
+          "description": "Adjust the exported React Query hooks used by default flows to call only methods that exist in the generated backend interface: ensure getCallerUserProfile uses actor.getCallerUserProfile, profile setup uses actor.saveCallerUserProfile (not a missing/incorrect method), profile customization uses actor.setProfileCustomization, admin detection uses actor.isCallerAdmin, and LandingPage company pages uses actor.getCompanyPages. Also ensure any hooks referenced by UI (e.g., company branding hooks) either call a real backend method or are safe placeholders that will not crash when invoked."
+        },
+        {
+          "path": "frontend/src/components/ProfileSetupModal.tsx",
+          "operation": "modify",
+          "description": "Update usage of the profile-save hook so the first-time profile setup persists via the backend method expected by the generated interface (saveCallerUserProfile inputs), and the app transitions cleanly to the correct dashboard afterward."
+        },
+        {
+          "path": "frontend/src/components/employer/CompanyBrandingTab.tsx",
+          "operation": "modify",
+          "description": "Reconcile referenced company branding hooks with what the backend interface actually provides: keep reads based on getCompanyPages when possible, and ensure create/update/upload actions degrade gracefully (clear toast + disabled or no-op) rather than attempting missing backend capabilities. Ensure any ExternalBlob direct URL calls are guarded. Use the blob-storage ExternalBlob capability (e.g., getDirectURL()) safely. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/LandingPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the company pages query hook used here is wired to an existing backend method (getCompanyPages) and that the UI correctly handles empty results and optional blobs without throwing."
         }
       ]
     }

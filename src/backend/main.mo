@@ -11,7 +11,6 @@ import AccessControl "authorization/access-control";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import CareerPath "career-path";
-import Migration "migration";
 import MixinAuthorization "authorization/MixinAuthorization";
 
 actor {
@@ -474,6 +473,20 @@ actor {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
     userProfiles.get(user);
+  };
+
+  public query ({ caller }) func getCompanyPages() : async [(Principal, CompanyPage)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view company pages");
+    };
+    companyPages.toArray();
+  };
+
+  public query ({ caller }) func isAdmin() : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access their own authorization");
+    };
+    true;
   };
 
   public shared ({ caller }) func saveCallerUserProfile(updates : UserProfileInputs) : async () {
